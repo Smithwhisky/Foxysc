@@ -18,23 +18,29 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    # 3. Dynamic Build Setup (Handles nested structures gracefully)
-    # 3. Regenerate a clean Gradle environment
-    - name: Force Clean Gradle Setup & Build
+ # 3. Force lock the runner environment to Gradle 8.5
+    - name: Setup Gradle 8.5 Environment
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: 8.5
+
+    # 4. Clean local wrappers and build with the localized 8.5 runtime
+    - name: Clean & Build with Gradle 8.5
       run: |
-        echo "🗑️ Removing corrupted local gradle wrappers to prevent syntax issues..."
+        echo "🗑️ Removing local wrappers..."
         rm -f gradlew
         rm -f gradlew.bat
         rm -rf gradle/wrapper/
         
-        echo "⚙️ Generating fresh, pristine Gradle Wrapper (v8.5)..."
+        echo "⚙️ Regenerating precise 8.5 wrapper..."
         gradle wrapper --gradle-version 8.5
         
-        echo "🔐 Setting executable permissions..."
+        echo "🔐 Setting execution permissions..."
         chmod +x gradlew
         
-        echo "🚀 Launching pristine compilation engine..."
-        ./gradlew assembleDebug
+        echo "🚀 Running compilation under permissive 8.5 engine..."
+        ./gradlew assembleDebug --no-daemon
+
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
