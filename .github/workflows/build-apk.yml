@@ -18,11 +18,24 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
-    - name: Build Debug APK
-      run: ./gradlew assembleDebug
+    # 3. Dynamic Build Setup (Handles nested structures gracefully)
+    - name: Build with Gradle
+      run: |
+        # Find where gradlew is actually located in the repository dynamically
+        GRADLEW_PATH=$(find . -name gradlew | head -n 1)
+        
+        if [ -z "$GRADLEW_PATH" ]; then
+          echo "⚠️ gradlew not found! Generating fallback wrapper configuration..."
+          gradle wrapper --gradle-version 8.5
+          chmod +x gradlew
+          ./gradlew assembleDebug
+        else
+          echo "🎯 Found gradlew at: $GRADLEW_PATH"
+          DIR_PATH=$(dirname "$GRADLEW_PATH")
+          cd "$DIR_PATH"
+          chmod +x gradlew
+          ./gradlew assembleDebug
+        fi
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
