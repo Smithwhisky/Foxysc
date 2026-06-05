@@ -18,29 +18,26 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
- # 3. Force lock the runner environment to Gradle 8.5
-    - name: Setup Gradle 8.5 Environment
+    - name: Setup Gradle 8.9 Environment
       uses: gradle/actions/setup-gradle@v3
       with:
-        gradle-version: 8.5
+        gradle-version: 8.9
 
-    # 4. Clean local wrappers and build with the localized 8.5 runtime
-    - name: Clean & Build with Gradle 8.5
+    - name: Clean & Build with Gradle 8.9
       run: |
         echo "🗑️ Removing local wrappers..."
         rm -f gradlew
         rm -f gradlew.bat
         rm -rf gradle/wrapper/
-        
-        echo "⚙️ Regenerating precise 8.5 wrapper..."
-        gradle wrapper --gradle-version 8.5
-        
+
+        echo "⚙️ Regenerating precise 8.9 wrapper..."
+        gradle wrapper --gradle-version 8.9
+
         echo "🔐 Setting execution permissions..."
         chmod +x gradlew
-        
-        echo "🚀 Running compilation under permissive 8.5 engine..."
-        ./gradlew assembleDebug --no-daemon
 
+        echo "🚀 Running compilation under 8.9 engine..."
+        ./gradlew assembleDebug --no-daemon
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
