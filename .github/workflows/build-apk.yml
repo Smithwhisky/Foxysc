@@ -19,23 +19,22 @@ jobs:
         distribution: 'temurin'
 
     # 3. Dynamic Build Setup (Handles nested structures gracefully)
-    - name: Build with Gradle
+    # 3. Regenerate a clean Gradle environment
+    - name: Force Clean Gradle Setup & Build
       run: |
-        # Find where gradlew is actually located in the repository dynamically
-        GRADLEW_PATH=$(find . -name gradlew | head -n 1)
+        echo "🗑️ Removing corrupted local gradle wrappers to prevent syntax issues..."
+        rm -f gradlew
+        rm -f gradlew.bat
+        rm -rf gradle/wrapper/
         
-        if [ -z "$GRADLEW_PATH" ]; then
-          echo "⚠️ gradlew not found! Generating fallback wrapper configuration..."
-          gradle wrapper --gradle-version 8.5
-          chmod +x gradlew
-          ./gradlew assembleDebug
-        else
-          echo "🎯 Found gradlew at: $GRADLEW_PATH"
-          DIR_PATH=$(dirname "$GRADLEW_PATH")
-          cd "$DIR_PATH"
-          chmod +x gradlew
-          ./gradlew assembleDebug
-        fi
+        echo "⚙️ Generating fresh, pristine Gradle Wrapper (v8.5)..."
+        gradle wrapper --gradle-version 8.5
+        
+        echo "🔐 Setting executable permissions..."
+        chmod +x gradlew
+        
+        echo "🚀 Launching pristine compilation engine..."
+        ./gradlew assembleDebug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
